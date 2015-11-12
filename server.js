@@ -18,20 +18,14 @@ function start() {
 	app.use(express.static(__dirname + '/statics'));
 
 	app.get('/', function (req, res) {
-		res.sendFile(__dirname + '/statics/index.html')
-	});
-
-	app.get('/addBulk', function (req, res) {
-		res.sendFile(__dirname + '/statics/addBulk.html')
+		res.sendFile(__dirname + '/html/index.html')
 	});
 
 	
-	app.post('/scan', requestHandlers.scan);
-	app.post('/getStudents', requestHandlers.getStudents);
-	app.post('/getIds', requestHandlers.getIds);
-	app.post('/add', requestHandlers.addStudent);
-	app.post('/edit', requestHandlers.editStudent);
-	app.post('/overView', requestHandlers.overView);
+
+	
+	app.get('/test', requestHandlers.test);
+	
 	app.post('/close', function(){
 		console.log(123);
 		process.exit(code=0);
