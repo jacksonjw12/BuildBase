@@ -6,10 +6,6 @@ Maybe you can build multiple forts and once maybe a pvp mode where you can build
 
 
 
-____________			____________
-|		  E |       	|		  E |
-|     X     | S       S |     X     |
-|___________|			|___________|
 
 You can unlock better tower armor plates and more floors.
 Upper floors will have to be scaled to, or will eed to be attacked by air things.
