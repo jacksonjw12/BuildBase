@@ -43,7 +43,7 @@ function main(){
 function render(){
 	physics()
 	//this is where we will send our state to the server
-	ctx.fillStyle = "#6AACAC";
+	ctx.fillStyle = "#FBFBFB";
 	ctx.fillRect(0,0,1000,1000);
 	ctx.fillStyle = "#" + player.name;
 	ctx.beginPath();
@@ -104,7 +104,7 @@ function keyUp(e){
 function makeName()
 {
     var text = "";
-    var possible = "ABCDEF0123456789";
+    var possible = "ABCDE0123456789";//no f becayse i dont want any tots white
 
     for( var i=0; i < 6; i++ )
         text += possible.charAt(Math.floor(Math.random() * possible.length));

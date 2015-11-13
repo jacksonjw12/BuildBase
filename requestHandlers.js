@@ -1,5 +1,12 @@
 var io
 var locations = [ {"name":"AAAABB","x":100,"y":100}, {"name":"BABCDC","x":200,"y":100}]
+
+//playerexample = {"Socket":socket, "Location":{"x":42,"y",24}, "Rotation":90, "IGN":"Richard Wang"}
+var worlds = {
+	"Players":[]
+
+}
+
 var allClients = []
 
 function test(req, res){
