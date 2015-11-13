@@ -4,55 +4,76 @@ var ctx;
 var player
 var keys = []
 var locations = []
+var room = ""
+function connect(){
+	roomName = document.getElementById("roomName").value;
+	playerName = document.getElementById("playerName").value;
+	
+	if(roomName != ""){
+		
+		room = roomName
+		document.getElementById("canvasHolder").innerHTML = '<canvas id="myCanvas" width="600" height="600" style="border:1px solid #000000;"></canvas>';
+		createPlayer(playerName)
+		
+		socket = io();
+		socket.on('requestNames', function (data){
+			socket.emit('returnNames', {"playerName":player.ign,"id":player.id,"roomName":roomName})
+			
+		});
+		socket.on('roomConnection', function(data){
+			main();
+			console.log("here we go")
+		});
+
+		socket.on('locations', function (data) {
+			locations = data.locations
+
+		});
+
+
+
+		
+	}
+
+	
+
+}
+
 function main(){
 	document.onkeydown = keyDown;
 	document.onkeyup = keyUp
+	
+
 	c = document.getElementById("myCanvas");
 	ctx = c.getContext("2d");
 	ctx.fillStyle = "#6AACAC";
 	ctx.fillRect(0,0,1000,1000);
 
-	createPlayer()
+	
 
 	ctx.beginPath();
 	ctx.arc(player.position.x,player.position.y,40,0,2*Math.PI);
 	ctx.stroke();
 
 	console.log("hey there!")
-
-	socket = io();
-	socket.on('nothing', function (data) {
-		console.log(data);
-		socket.emit('my other event', { my: 'data' });
-	});
-
-	socket.on('locations', function (data) {
-		
-		locdata = data.locations
-		
-
-		locations = locdata
-
-	});
-
-
-	render()
+	
+	step()
 
 }
 
-function render(){
+function step(){
 	physics()
 	//this is where we will send our state to the server
 	ctx.fillStyle = "#FBFBFB";
 	ctx.fillRect(0,0,1000,1000);
-	ctx.fillStyle = "#" + player.name;
+	ctx.fillStyle = "#" + player.id;
 	ctx.beginPath();
 	ctx.arc(player.position.x,player.position.y,40,0,2*Math.PI);
 	ctx.fill();
 
 	for(var i = 0; i< locations.length; i++){
-		if(locations[i].name != player.name){
-			ctx.fillStyle = "#" +locations[i].name
+		if(locations[i].id != player.id){
+			ctx.fillStyle = "#" +locations[i].id
 			ctx.beginPath();
 			ctx.arc(locations[i].x,locations[i].y,40,0,2*Math.PI);
 			ctx.fill();
@@ -60,7 +81,7 @@ function render(){
 		
 	}
 
-	setTimeout(render, 10)
+	setTimeout(step, 10)
 }
 
 function physics(){
@@ -81,7 +102,8 @@ function physics(){
 }
 
 function reportPosition(){
-	socket.emit('myLocation', {"name": player.name, "x":player.position.x, "y":player.position.y});
+	socket.emit('myLocation', {"roomName": room, "x":player.position.x, "y":player.position.y, "id":player.id});
+	
 
 }
 
@@ -101,7 +123,7 @@ function keyUp(e){
 	} 
   
 }
-function makeName()
+function makeId()
 {
     var text = "";
     var possible = "ABCDE0123456789";//no f becayse i dont want any tots white
@@ -111,12 +133,13 @@ function makeName()
 
     return text;
 }
-function createPlayer(){
+function createPlayer(name){
 	player = {};
 	player.position = {};
 	player.position.x = 300;
 	player.position.y = 300;
-	player.name = makeName()
+	player.id = makeId()
+	player.ign = name
 
 }
 
@@ -124,4 +147,3 @@ function createPlayer(){
 
 
 
-main();
