@@ -1,13 +1,14 @@
 var io
 var locations = [ {"name":"AAAABB","x":100,"y":100}, {"name":"BABCDC","x":200,"y":100}]
 
-//playerexample = {"Socket":socket, "Location":{"x":42,"y",24}, "Rotation":90, "IGN":"Richard Wang"}
-var worlds = {
-	"Players":[]
+//playerexample = {"Socket":socket, "Location":{"x":42,"y",24}, "Rotation":90, "IGN":"Richard Wang", GameRoom:bestgame}
+//gameroom example = {"name":abcd, }
 
-}
+//var worlds = {
+	//"Players":[]
+	//"GameRooms":[]
+//}
 
-var allClients = []
 
 function test(req, res){
 	console.log("eyy lmao")
@@ -17,7 +18,7 @@ function test(req, res){
 function initializeSockets(server){
 	io = require('socket.io')(server);
 	io.on('connection', function (socket) {
-		allClients.push(socket);
+		//allClients.push(socket);
 		socket.join('gameRoom1')
 		socket.emit('locations', {"locations": locations});
 		socket.on('myLocation', function (data) {
