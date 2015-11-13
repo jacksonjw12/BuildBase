@@ -21,24 +21,13 @@ function start() {
 		res.sendFile(__dirname + '/html/index.html')
 	});
 
-	
-	
 	app.get('/test', requestHandlers.test);
 	
-	app.post('/close', function(){
-		console.log(123);
-		process.exit(code=0);
-	});
 	var server = app.listen(8080);
-	var io = require('socket.io')(server);
-	io.on('connection', function (socket) {
-
-		socket.join('the best room')
-		socket.emit('news', { hello: 'world' });
-			socket.on('my other event', function (data) {
-			console.log(data);
-		});
-	});
+	
+	requestHandlers.initializeSockets(server);
+	
+	
 
 
 
