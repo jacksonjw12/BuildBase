@@ -7,13 +7,13 @@ var worldExample = {
 	"name":"room1",
 	"players":[
 	{
-		"id":"AAAABB",
+		"id":"000022",
 		"socket":123,
-		"ign":"jill"
+		"ign":"jack"
 	},
 	{
-		"id":"BABDC",
-		"socket":123,
+		"id":"FF5555",
+		"socket":1235,
 		"ign":"jill"
 	}
 
@@ -31,20 +31,20 @@ var worlds = [{
 	"name":"room1",
 	"players":[
 	{
-		"id":"AAAABB",
+		"id":"000022",
 		"socket":123,
-		"ign":"jill"
+		"ign":"jack"
 	},
 	{
-		"id":"BABDC",
-		"socket":123,
+		"id":"FF5555",
+		"socket":1235,
 		"ign":"jill"
 	}
 
 	],
 	"tileData":[[0,1,1,0],[1,0,0,1],[1,0,0,1],[0,1,1,0]],
 
-	"playerData":[ {"id":"AAAABB","x":100,"y":100}, {"id":"BABCDC","x":200,"y":100}]
+	"playerData":[ {"id":"000022","x":400,"y":500}, {"id":"FF5555","x":300,"y":400}]
 
 }];
 
@@ -55,14 +55,14 @@ var connectedPlayers = [
 		"name":"jack",
 		"room":"room1",
 		"socket":123,
-		"id":"AAAABB"
+		"id":"000022"
 
 	},
 	{
 		"name":"jill",
 		"room":"room1",
-		"socket":123,
-		"id":"BABCDC"
+		"socket":1235,
+		"id":"FF5555"
 
 	}
 
@@ -117,9 +117,12 @@ function initializeSockets(server){
 
 
 
-			console.log("-----disconnected-------");
+			console.log("disconnected");
 		});
-
+		socket.on('sendMessage', function(data){
+			console.log("----" + data.message + "---")
+			io.to(data.roomName).emit('receivedMessage', data)
+		});
 		socket.on('returnNames', function (data){
 			socket.join(data.roomName)
 			newRoom = true;

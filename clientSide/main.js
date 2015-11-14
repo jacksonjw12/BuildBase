@@ -5,6 +5,7 @@ var player
 var keys = []
 var locations = []
 var room = ""
+var speed = 5;
 function connect(){
 	roomName = document.getElementById("roomName").value;
 	playerName = document.getElementById("playerName").value;
@@ -12,7 +13,10 @@ function connect(){
 	if(roomName != ""){
 		
 		room = roomName
-		document.getElementById("canvasHolder").innerHTML = '<canvas id="myCanvas" width="600" height="600" style="border:1px solid #000000;"></canvas>';
+		document.getElementById("canvasHolder").innerHTML =
+		 '<canvas id="myCanvas" width="600" height="600" style="border:1px solid #ababab;float:left;"></canvas>' + 
+		 '<div id="chatContainer" style="padding-bottom:7px;display: inline-block;height:600px;width:400px;border:1px solid #ababab;">' + 
+		 '<div style="overflow-y:scroll;height:570px;" id="chat"></div><br><form action="javascript:sendMessage()"><input type="text" style="width:80%;" id="chatTextBox"><input style="width:20%;"type="submit"></form></div>';
 		createPlayer(playerName)
 		
 		socket = io();
@@ -30,7 +34,7 @@ function connect(){
 
 		});
 
-
+		socket.on('receivedMessage', receivedMessage)
 
 		
 	}
@@ -38,11 +42,12 @@ function connect(){
 	
 
 }
-
+var stars = undefined;
 function main(){
 	document.onkeydown = keyDown;
 	document.onkeyup = keyUp
-	
+	stars = new Image();
+	stars.src = 'stars.gif';
 
 	c = document.getElementById("myCanvas");
 	ctx = c.getContext("2d");
@@ -66,16 +71,36 @@ function step(){
 	//this is where we will send our state to the server
 	ctx.fillStyle = "#FBFBFB";
 	ctx.fillRect(0,0,1000,1000);
+	var img = document.getElementById("scream");
+    ctx.drawImage(stars, player.screenCenter.x/5, player.screenCenter.y/5, 600/5, 600/5,0,0,600,600);//the divided by's needs be the same or parallax stuff
+
+    if(player.screenCenter.x - player.position.x > 100 ){
+    	
+    	player.screenCenter.x -= speed
+    }
+    else if(player.screenCenter.x - player.position.x < -100 ){
+    	
+    	player.screenCenter.x += speed
+    }
+    if(player.screenCenter.y - player.position.y > 100 ){
+    	
+    	player.screenCenter.y-= speed
+    }
+    else if(player.screenCenter.y - player.position.y < -100 ){
+    	player.screenCenter.y += speed
+    }
+
 	ctx.fillStyle = "#" + player.id;
 	ctx.beginPath();
-	ctx.arc(player.position.x,player.position.y,40,0,2*Math.PI);
+	ctx.arc(300-(player.screenCenter.x-player.position.x),300-(player.screenCenter.y-player.position.y),40,0,2*Math.PI);
 	ctx.fill();
 
 	for(var i = 0; i< locations.length; i++){
 		if(locations[i].id != player.id){
+
 			ctx.fillStyle = "#" +locations[i].id
 			ctx.beginPath();
-			ctx.arc(locations[i].x,locations[i].y,40,0,2*Math.PI);
+			ctx.arc(locations[i].x-player.screenCenter.x+300,locations[i].y-player.screenCenter.y+300,40,0,2*Math.PI);
 			ctx.fill();
 		}
 		
@@ -85,20 +110,23 @@ function step(){
 }
 
 function physics(){
-	if(keys.indexOf(87) != -1){
-		player.position.y-=5;
-	}
-	if(keys.indexOf(83) != -1){
-		player.position.y+=5;
-	}
-	if(keys.indexOf(65) != -1){
-		player.position.x-=5;
-	}
-	if(keys.indexOf(68) != -1){
-		player.position.x+=5;
+	if(document.activeElement == document.body){
+
+		if(keys.indexOf(87) != -1){
+			player.position.y-=speed;
+		}
+		if(keys.indexOf(83) != -1){
+			player.position.y+=speed;
+		}
+		if(keys.indexOf(65) != -1){
+			player.position.x-=speed;
+		}
+		if(keys.indexOf(68) != -1){
+			player.position.x+=speed;
+		}
+		reportPosition()
 	}
 	
-	reportPosition()
 }
 
 function reportPosition(){
@@ -140,8 +168,20 @@ function createPlayer(name){
 	player.position.y = 300;
 	player.id = makeId()
 	player.ign = name
+	player.screenCenter = {}
+	player.screenCenter.x = player.position.x
+	player.screenCenter.y = player.position.y
 
 }
+function sendMessage(){
+	var message = document.getElementById("chatTextBox").value;
+	socket.emit('sendMessage', {"message":message,"roomName":room,"ign":player.ign,"id":player.id})
+	document.getElementById("chatTextBox").value = "";
+}
+function receivedMessage(data){
+	document.getElementById("chat").innerHTML+= '<u style="color:#' + data.id + '">' + data.ign + '</u>' + ' : ' + data.message + '</br>';
+}
+
 
 
 
