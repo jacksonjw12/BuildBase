@@ -180,6 +180,8 @@ function sendMessage(){
 }
 function receivedMessage(data){
 	document.getElementById("chat").innerHTML+= '<u style="color:#' + data.id + '">' + data.ign + '</u>' + ' : ' + data.message + '</br>';
+	var objDiv = document.getElementById("chat");
+	objDiv.scrollTop = objDiv.scrollHeight;
 }
 
 
