@@ -26,13 +26,7 @@ var worldExample = {
 
 
 
-var connectedPlayers = [
-	{
-		"name":"jack",
-		"room":"room1"
 
-	}
-]
 var worlds = [{
 	"name":"room1",
 	"players":[
@@ -59,7 +53,16 @@ var worlds = [{
 var connectedPlayers = [
 	{
 		"name":"jack",
-		"room":"room1"
+		"room":"room1",
+		"socket":123,
+		"id":"AAAABB"
+
+	},
+	{
+		"name":"jill",
+		"room":"room1",
+		"socket":123,
+		"id":"BABCDC"
 
 	}
 
@@ -79,6 +82,44 @@ function initializeSockets(server){
 			
 		socket.emit('requestNames', {});
 			
+		socket.on('disconnect', function (data){
+			for(playerIterator in connectedPlayers){
+				player = connectedPlayers[playerIterator];
+				if(player.socket == socket){
+					var disconnectedPlayerRoom = player.room;
+					var disconnectedPlayerId = player.id;
+					connectedPlayers.splice(playerIterator,1)
+					for(worldIterator in worlds){
+						world = worlds[worldIterator]
+						if(world.name == disconnectedPlayerRoom){
+							
+							for(var playerIterator2 in world.playerData){
+								var player = world.playerData[playerIterator2];
+								if(player.id == disconnectedPlayerId){
+									world.playerData.splice(playerIterator2, 1)
+								}
+							}
+
+							for(var playerIterator2 in world.players){
+								var player = world.players[playerIterator2];
+								if(player.id == disconnectedPlayerId){
+									world.players.splice(playerIterator2, 1)
+								}
+							}
+
+
+						}
+					}
+
+
+				}
+			}
+
+
+
+			console.log("-----disconnected-------");
+		});
+
 		socket.on('returnNames', function (data){
 			socket.join(data.roomName)
 			newRoom = true;
@@ -97,6 +138,8 @@ function initializeSockets(server){
 				worlds.push(worldExample)
 				console.log("new room")
 			}
+			connectedPlayers.push({"socket":socket,"name":data.playerName,"room":data.roomName,"id":data.id})
+
 			socket.emit('roomConnection', {})
 			
 		});
