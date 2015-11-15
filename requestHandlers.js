@@ -18,7 +18,7 @@ var worldExample = {
 	}
 
 	],
-	"tileData":[[0,1,1,0],[1,0,0,1],[1,0,0,1],[0,1,1,0]],
+	"tileData":[{"id":0,"x":5,"y":5},{"id":1,"x":6,"y":5},{"id":0,"x":7,"y":5}],//instead of 2d array i will try a block object system
 
 	"playerData":[]
 
@@ -42,7 +42,7 @@ var worlds = [{
 	}
 
 	],
-	"tileData":[[0,1,1,0],[1,0,0,1],[1,0,0,1],[0,1,1,0]],
+	"tileData":[{"id":999955,"x":3,"y":5,"z":0},{"id":990022,"x":6,"y":5,"z":0},{"id":110090,"x":10,"y":5,"z":0}],//instead of 2d array i will try a block object system
 
 	"playerData":[ {"id":"000022","x":400,"y":500}, {"id":"FF5555","x":300,"y":400}]
 
@@ -123,13 +123,15 @@ function initializeSockets(server){
 			console.log("----" + data.message + "---")
 			io.to(data.roomName).emit('receivedMessage', data)
 		});
-		socket.on('returnNames', function (data){
+		socket.on('returnNames', function (data){//This is what is called when aplayer fully joins a room for good
 			socket.join(data.roomName)
 			newRoom = true;
 			for(worldIterator in worlds){
 				world = worlds[worldIterator]
 				if(world.name == data.roomName){
 					world.players.push({"id":data.id, "socket":socket, "ign":data.playerName})
+					socket.emit('newTileData', {"numberOf":"multiple", "tiles":world.tileData})
+					console.log("gave tile data----------------------------------------------")
 					newRoom = false;
 
 				}
@@ -142,6 +144,7 @@ function initializeSockets(server){
 				console.log("new room")
 			}
 			connectedPlayers.push({"socket":socket,"name":data.playerName,"room":data.roomName,"id":data.id})
+
 
 			socket.emit('roomConnection', {})
 			
