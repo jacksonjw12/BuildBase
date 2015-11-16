@@ -187,8 +187,34 @@ function initializeSockets(server){
 			}
 
 		});
+		socket.on('addedTile', function (data){
 
-		io.to('the_best_room').emit('news', {hello: 'based god'});
+			for(worldIterator in worlds){
+				world = worlds[worldIterator]
+				
+				if(world.name == data.roomName){
+					var newTile = true;
+					for(var i = 0; i<world.tileData.length; i++){
+						if(data.tile.x == world.tileData[i].x && data.tile.y == world.tileData[i].y && data.tile.z == world.tileData[i].z){
+							world.tileData[i].id = data.tile.id;
+							newTile = false;
+						}
+					}
+					if(newTile){
+						world.tileData.push(data.tile)
+					}
+					io.to(data.roomName).emit('newTileData', {"numberOf":"single", "tile":data.tile})
+
+				}
+				
+			}
+
+
+
+		});
+
+		
+		
 	});
 
 

@@ -158,7 +158,9 @@ function physics(){
 			xDelta++;
 
 		}
-		
+		if(keys.indexOf(66) != -1){
+			createTile(101099)
+		}
 		if(xDelta != 0 || yDelta != 0){
 			var angle = 0;
 			if(xDelta > 0){
@@ -184,7 +186,6 @@ function physics(){
 		}
 
 		//collision time :) todo, make sure a player cant put a block ontop of a player, or that once they do, that player is either immune or gets booted out of the way
-		//TODO, change instead of making the player jjump forward then move back, have a potential forward that is changed, thena added ifunowhaddimean
 		//player.position.x player.position.y
 		for(var i = 0; i<tileData.length; i++){
 			var tile = tileData[i]
@@ -278,6 +279,55 @@ function sendMessage(){
 	socket.emit('sendMessage', {"message":message,"roomName":room,"ign":player.ign,"id":player.id})
 	document.getElementById("chatTextBox").value = "";
 }	
+
+function createTile(blockID){
+	//rn physics will call this
+	var blockWiseX = Math.floor((player.position.x+tileSize/2)/tileSize)
+	var blockWiseY = Math.floor((player.position.y+tileSize/2)/tileSize)
+	var blockWiseXLeft = Math.floor((player.position.x-playerRadius)/tileSize);
+	var blockWiseYUp = Math.floor((player.position.y-playerRadius)/tileSize);
+	var blockWiseXRight = Math.floor((player.position.x+tileSize/2+playerRadius)/tileSize);
+	var blockWiseYDown = Math.floor((player.position.y+tileSize/2+playerRadius)/tileSize);
+	console.log(player.rotation)
+	var rot = player.rotation/Math.PI*180
+	if(rot == 0){
+		
+		blockWiseX = blockWiseXRight
+	}
+	else if(rot == 45){
+		blockWiseX = blockWiseXRight
+		blockWiseX = blockWiseXDown
+	}
+	else if(rot == 90){
+		blockWiseY = blockWiseYUp
+	}
+	else if(rot == 135){
+		blockWiseX = blockWiseXLeft
+		blockWiseY = blockWiseYUp
+	}
+	else if(rot == 180){
+		blockWiseX = blockWiseXLeft
+		
+	}
+	else if(rot == 235){
+		blockWiseX = blockWiseXLeft
+		blockWiseY = blockWiseYDown
+	}
+	else if(rot == 270){
+		
+		blockWiseY = blockWiseYDown
+	}
+	else if(rot == 315){
+		blockWiseX = blockWiseXRight
+		blockWiseY = blockWiseYDown
+	}
+	
+	socket.emit('addedTile', {"tile":{"id":blockID,"x":blockWiseX,"y":blockWiseY,"z":0},"roomName":room})
+
+
+
+}
+
 function receivedMessage(data){
 	document.getElementById("chat").innerHTML+= '<u style="color:#' + data.id + '">' + data.ign + '</u>' + ' : ' + data.message + '</br>';
 	var objDiv = document.getElementById("chat");
