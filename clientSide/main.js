@@ -135,11 +135,13 @@ function render(){
 	}
 }
 function physics(){
+	
 	if(document.activeElement == document.body){
 		var xDelta = 0;
 		var yDelta = 0;
 		var prevX = player.position.x
 		var prevY = player.position.y
+
 		if(keys.indexOf(87) != -1){
 			player.position.y-=speed;
 			yDelta++;
@@ -236,9 +238,18 @@ function reportPosition(){
 }
 
 function keyDown(e){
+	badKeys = [13,183]//i dont like 183, (actually maybe this will create an error someday lol sorry me)
 	value = e.keyCode
-	if(keys.indexOf(value) == -1){
+	if(keys.indexOf(value) == -1 && badKeys.indexOf(value) == -1){
 		keys.push(value)
+	}
+	if(value == 13){
+		if(document.activeElement == document.body){
+			document.getElementById("chatTextBox").focus()
+		}
+		else{
+			document.getElementById("chatTextBox").blur()
+		}
 	}
 }
 function keyUp(e){
@@ -276,8 +287,12 @@ function createPlayer(name){
 }
 function sendMessage(){
 	var message = document.getElementById("chatTextBox").value;
-	socket.emit('sendMessage', {"message":message,"roomName":room,"ign":player.ign,"id":player.id})
-	document.getElementById("chatTextBox").value = "";
+	if(value != "" && typeof value == "string"){
+		
+		socket.emit('sendMessage', {"message":message,"roomName":room,"ign":player.ign,"id":player.id})
+		document.getElementById("chatTextBox").value = "";
+	}
+	
 }	
 
 function createTile(blockID){
@@ -291,7 +306,7 @@ function createTile(blockID){
 	console.log(player.rotation)
 	var rot = player.rotation/Math.PI*180
 	if(rot == 0){
-		
+			
 		blockWiseX = blockWiseXRight
 	}
 	else if(rot == 45){

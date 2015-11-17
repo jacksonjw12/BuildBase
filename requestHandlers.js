@@ -125,6 +125,7 @@ function initializeSockets(server){
 		});
 		socket.on('returnNames', function (data){//This is what is called when aplayer fully joins a room for good
 			socket.join(data.roomName)
+			io.to(data.roomName).emit('receivedMessage', {"message":data.playerName + " has connected", "ign":data.roomName,"id":data.id})
 			newRoom = true;
 			for(worldIterator in worlds){
 				world = worlds[worldIterator]
