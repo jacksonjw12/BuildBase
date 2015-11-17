@@ -22,7 +22,7 @@ function connect(){
 		document.getElementById("canvasHolder").innerHTML =
 		 '<canvas id="myCanvas" width="' + gameDimmensions[0] + 'px" height="' + gameDimmensions[1] +'px" style="border:1px solid #ababab;float:left;"></canvas>' + 
 		 '<div id="chatContainer" style="padding-bottom:7px;display: inline-block;height:' + chatDimmensions[1] + 'px;width:'+chatDimmensions[0]+'px;border:1px solid #ababab;">' + 
-		 '<div style="overflow-y:scroll;height:'+(chatDimmensions[1]-30)+'px;" id="chat"></div><br><form action="javascript:sendMessage()"><input type="text" style="width:80%;" id="chatTextBox"><input style="width:20%;"type="submit"></form></div>';
+		 '<div style="overflow-y:scroll;height:'+(chatDimmensions[1]-30)+'px;" id="chat"></div><br><form action="javascript:sendMessage()"><input type="text" style="width:80%;" id="chatTextBox"><input style="width:20%;" type="submit" id="chatBoxSubmit"></form></div>';
 		createPlayer(playerName)
 		
 		socket = io();
@@ -247,8 +247,12 @@ function keyDown(e){
 		if(document.activeElement == document.body){
 			document.getElementById("chatTextBox").focus()
 		}
-		else{
+		else if(document.getElementById("chatTextBox").value == "" || typeof document.getElementById("chatTextBox").value != "string"){
 			document.getElementById("chatTextBox").blur()
+		}
+		else{
+			sendMessage();
+			console.log('ey')
 		}
 	}
 }
@@ -286,9 +290,10 @@ function createPlayer(name){
 
 }
 function sendMessage(){
+	console.log("wasup")
 	var message = document.getElementById("chatTextBox").value;
-	if(value != "" && typeof value == "string"){
-		
+	if(message != "" && typeof message == "string"){
+		console.log("dude")
 		socket.emit('sendMessage', {"message":message,"roomName":room,"ign":player.ign,"id":player.id})
 		document.getElementById("chatTextBox").value = "";
 	}
