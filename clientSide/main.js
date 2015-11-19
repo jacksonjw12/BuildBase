@@ -12,6 +12,8 @@ var chatDimmensions = [400,600]
 var tileData = []
 var playerRadius = 40;
 var blockSize = 100;
+var mouseCoords = [gameDimmensions[0]/2,gameDimmensions[1]/2]
+var blockPlacementMode = true;
 function connect(){
 	roomName = document.getElementById("roomName").value;
 	playerName = document.getElementById("playerName").value;
@@ -56,6 +58,11 @@ function main(){
 	stars.src = 'stars.gif';
 
 	c = document.getElementById("myCanvas");
+
+	c.addEventListener('mousemove',mouseMove, false);
+
+	c.addEventListener('click', mouseClick, false);
+
 	ctx = c.getContext("2d");
 	ctx.fillStyle = "#6AACAC";
 	ctx.fillRect(0,0,gameDimmensions[0],gameDimmensions[1]);
@@ -85,6 +92,47 @@ function render(){
 	ctx.fillRect(0,0,1000,1000);
 	var img = document.getElementById("scream");
     ctx.drawImage(stars, player.screenCenter.x/5, player.screenCenter.y/5, gameDimmensions[0]/5, gameDimmensions[1]/5,0,0,gameDimmensions[0],gameDimmensions[1]);//the divided by's needs be the same or parallax stuff
+
+    if(blockPlacementMode){
+    	ctx.save();
+    	ctx.fillStyle = "#ADD8E6"
+		ctx.globalAlpha = 0.4;
+		ctx.beginPath();
+		ctx.arc(gameDimmensions[0]/2-(player.screenCenter.x-player.position.x),gameDimmensions[1]/2-(player.screenCenter.y-player.position.y),300,0,2*Math.PI);
+		ctx.fill();
+		ctx.clip();
+		var beginXPos = (Math.floor(player.position.x/blockSize*2)-10)*blockSize;
+		var beginYPos = (Math.floor(player.position.y/blockSize*2)-10)*blockSize;
+		var finalXPos = beginXPos + 20 * blockSize;
+		var finalYPos = beginYPos + 20 * blockSize;
+
+		for(var i = 0; i<20; i++){
+			ctx.beginPath();
+			ctx.moveTo((beginXPos+i*blockSize)-player.screenCenter.x-blockSize/2,beginYPos);
+			ctx.lineTo((beginXPos+i*blockSize)-player.screenCenter.x-blockSize/2,finalYPos);
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.moveTo((beginXPos+i*blockSize)-player.screenCenter.x-blockSize/2+1,beginYPos);
+			ctx.lineTo((beginXPos+i*blockSize)-player.screenCenter.x-blockSize/2+1,finalYPos);
+			ctx.stroke();
+
+			ctx.beginPath();
+			ctx.moveTo(beginXPos,(beginYPos+i*blockSize)-player.screenCenter.y-blockSize/2);
+			ctx.lineTo(finalXPos,(beginYPos+i*blockSize)-player.screenCenter.y-blockSize/2);
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.moveTo(beginXPos,(beginYPos+i*blockSize)-player.screenCenter.y-blockSize/2+1);
+			ctx.lineTo(finalXPos,(beginYPos+i*blockSize)-player.screenCenter.y-blockSize/2+1);
+			ctx.stroke();
+
+
+		}
+
+
+
+		ctx.restore();
+    }
+
 
     if(player.screenCenter.x - player.position.x > 100 ){
     	
@@ -141,6 +189,10 @@ function physics(){
 		var yDelta = 0;
 		var prevX = player.position.x
 		var prevY = player.position.y
+
+		if(keys.indexOf(67) != -1){
+			blockPlacementMode = !blockPlacementMode
+		}
 
 		if(keys.indexOf(87) != -1){
 			player.position.y-=speed;
@@ -233,10 +285,16 @@ function physics(){
 
 function reportPosition(){
 	socket.emit('myLocation', {"roomName": room, "x":player.position.x, "y":player.position.y, "id":player.id});
-	
-
 }
 
+function mouseMove(evt) {
+	mouseCoords = getMousePos(c, evt);
+	//console.log('Mouse position: ' + mouseCoords.x + ',' + mouseCoords.y);
+	
+}
+function mouseClick(evt){
+	//console.log('Mouse position on click: ' + mouseCoords.x + ',' + mouseCoords.y);
+}
 function keyDown(e){
 	badKeys = [13,183]//i dont like 183, (actually maybe this will create an error someday lol sorry me)
 	value = e.keyCode
@@ -266,6 +324,15 @@ function keyUp(e){
 	} 
   
 }
+
+function getMousePos(canvas, evt) {
+	var rect = canvas.getBoundingClientRect();
+	return {
+		x: evt.clientX - rect.left,
+		y: evt.clientY - rect.top
+	};
+}
+
 function makeId()
 {
     var text = "";
