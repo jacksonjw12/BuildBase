@@ -107,7 +107,26 @@ function drawSprite(){
 		animationState++;
 	}
 	else{
-		ctx.drawImage(spriteSheet, 13,13,25,35,gameDimmensions[0]/2-(player.screenCenter.x-player.position.x)-playerRadius,gameDimmensions[1]/2-(player.screenCenter.y-player.position.y) - playerRadius,80,80);
+
+		var row = 0;
+		var rot = player.rotation*180/Math.PI
+		col = 0
+		if(rot == 0){
+			row = 2	
+		}
+		else if(rot == 45 || rot == 90 || rot == 135){
+			row = 3
+		}
+		else if(rot == 180){
+			row = 1
+		}
+		else{
+			row = 0
+		}
+		var sx = 13 + 51*col
+		var sy = 8 + 51*row
+		animationState = 0;
+		ctx.drawImage(spriteSheet, sx,sy,swidth,sheight,gameDimmensions[0]/2-(player.screenCenter.x-player.position.x)-playerRadius,gameDimmensions[1]/2-(player.screenCenter.y-player.position.y) - playerRadius,80,80);
 
 	}
 	
