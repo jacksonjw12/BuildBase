@@ -12,8 +12,9 @@ var chatDimmensions = [400,600]
 var tileData = []
 var playerRadius = 40;
 var blockSize = 100;
-var mouseCoords = [gameDimmensions[0]/2,gameDimmensions[1]/2]
+var mouseCoords = {"x":gameDimmensions[0]/2,"y":gameDimmensions[1]/2}
 var blockPlacementMode = true;
+var stars = undefined;
 function connect(){
 	roomName = document.getElementById("roomName").value;
 	playerName = document.getElementById("playerName").value;
@@ -50,10 +51,12 @@ function connect(){
 	
 
 }
-var stars = undefined;
+
 function main(){
 	document.onkeydown = keyDown;
 	document.onkeyup = keyUp
+	
+
 	stars = new Image();
 	stars.src = 'stars.gif';
 
@@ -64,6 +67,9 @@ function main(){
 	c.addEventListener('click', mouseClick, false);
 
 	ctx = c.getContext("2d");
+
+	initializeRenderFile(c, ctx, stars)//canvas context bg
+
 	ctx.fillStyle = "#6AACAC";
 	ctx.fillRect(0,0,gameDimmensions[0],gameDimmensions[1]);
 
@@ -87,101 +93,7 @@ function step(){
 
 	setTimeout(step, timestep)
 }
-function render(){
-	ctx.fillStyle = "#FBFBFB";
-	ctx.fillRect(0,0,1000,1000);
-	var img = document.getElementById("scream");
-    ctx.drawImage(stars, player.screenCenter.x/5, player.screenCenter.y/5, gameDimmensions[0]/5, gameDimmensions[1]/5,0,0,gameDimmensions[0],gameDimmensions[1]);//the divided by's needs be the same or parallax stuff
 
-    if(blockPlacementMode){
-    	ctx.save();
-    	ctx.fillStyle = "#ADD8E6"
-		ctx.globalAlpha = 0.4;
-		ctx.beginPath();
-		ctx.arc(gameDimmensions[0]/2-(player.screenCenter.x-player.position.x),gameDimmensions[1]/2-(player.screenCenter.y-player.position.y),300,0,2*Math.PI);
-		ctx.fill();
-		ctx.clip();
-		var beginXPos = (Math.floor(player.position.x/blockSize*2)-10)*blockSize;
-		var beginYPos = (Math.floor(player.position.y/blockSize*2)-10)*blockSize;
-		var finalXPos = beginXPos + 20 * blockSize;
-		var finalYPos = beginYPos + 20 * blockSize;
-
-		for(var i = 0; i<20; i++){
-			ctx.beginPath();
-			ctx.moveTo((beginXPos+i*blockSize)-player.screenCenter.x-blockSize/2,beginYPos);
-			ctx.lineTo((beginXPos+i*blockSize)-player.screenCenter.x-blockSize/2,finalYPos);
-			ctx.stroke();
-			ctx.beginPath();
-			ctx.moveTo((beginXPos+i*blockSize)-player.screenCenter.x-blockSize/2+1,beginYPos);
-			ctx.lineTo((beginXPos+i*blockSize)-player.screenCenter.x-blockSize/2+1,finalYPos);
-			ctx.stroke();
-
-			ctx.beginPath();
-			ctx.moveTo(beginXPos,(beginYPos+i*blockSize)-player.screenCenter.y-blockSize/2);
-			ctx.lineTo(finalXPos,(beginYPos+i*blockSize)-player.screenCenter.y-blockSize/2);
-			ctx.stroke();
-			ctx.beginPath();
-			ctx.moveTo(beginXPos,(beginYPos+i*blockSize)-player.screenCenter.y-blockSize/2+1);
-			ctx.lineTo(finalXPos,(beginYPos+i*blockSize)-player.screenCenter.y-blockSize/2+1);
-			ctx.stroke();
-
-
-		}
-
-
-
-		ctx.restore();
-    }
-
-
-    if(player.screenCenter.x - player.position.x > 100 ){
-    	
-    	player.screenCenter.x -= speed
-    }
-    else if(player.screenCenter.x - player.position.x < -100 ){
-    	
-    	player.screenCenter.x += speed
-    }
-    if(player.screenCenter.y - player.position.y > 100 ){
-    	
-    	player.screenCenter.y-= speed
-    }
-    else if(player.screenCenter.y - player.position.y < -100 ){
-    	player.screenCenter.y += speed
-
-    }
-    //plr---
-	ctx.fillStyle = "#" + player.id;
-	ctx.beginPath();
-	ctx.arc(gameDimmensions[0]/2-(player.screenCenter.x-player.position.x),gameDimmensions[1]/2-(player.screenCenter.y-player.position.y),playerRadius,0,2*Math.PI);
-	ctx.fill();
-
-	ctx.fillStyle = "#000000";
-	ctx.beginPath();
-	ctx.moveTo(gameDimmensions[0]/2-(player.screenCenter.x-player.position.x),gameDimmensions[1]/2-(player.screenCenter.y-player.position.y));
-	ctx.lineTo(gameDimmensions[0]/2-(player.screenCenter.x-player.position.x)+playerRadius*Math.cos(player.rotation),gameDimmensions[1]/2-(player.screenCenter.y-player.position.y)-playerRadius*Math.sin(player.rotation));
-	ctx.stroke();
-	//\plr--
-
-	if(tileData.length != 0){
-		for(var j = 0; j<tileData.length; j++){
-			ctx.fillStyle = "#" + tileData[j].id.toString();
-			ctx.fillRect(gameDimmensions[0]/2-(player.screenCenter.x-blockSize*tileData[j].x)-blockSize/2,gameDimmensions[1]/2-(player.screenCenter.y-blockSize*tileData[j].y)-blockSize/2,blockSize,blockSize);
-		}
-	}
-
-	//draw others
-	for(var i = 0; i< locations.length; i++){
-		if(locations[i].id != player.id){
-
-			ctx.fillStyle = "#" +locations[i].id
-			ctx.beginPath();
-			ctx.arc(locations[i].x-player.screenCenter.x+gameDimmensions[0]/2,locations[i].y-player.screenCenter.y+gameDimmensions[1]/2,playerRadius,0,2*Math.PI);
-			ctx.fill();
-		}
-		
-	}
-}
 function physics(){
 	
 	if(document.activeElement == document.body){
