@@ -152,6 +152,7 @@ function drawTileSpotlight(){
 		var cursorScreenY = gameDimmensions[1]/2-(player.screenCenter.y-blockSize*cursorBlockY)-blockSize/2
 		ctx.fillRect(cursorScreenX,cursorScreenY,blockSize,blockSize);
 
+		activeBlock = {"x":cursorBlockX, "y":cursorBlockY}
 
 		//ctx.fillRect(cursorXPos,cursorYPos,blockSize,blockSize)
 

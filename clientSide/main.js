@@ -15,6 +15,7 @@ var blockSize = 100;
 var mouseCoords = {"x":gameDimmensions[0]/2,"y":gameDimmensions[1]/2}
 var blockPlacementMode = true;
 var stars = undefined;
+var activeBlock = {}
 function connect(){
 	roomName = document.getElementById("roomName").value;
 	playerName = document.getElementById("playerName").value;
@@ -206,7 +207,36 @@ function mouseMove(evt) {
 }
 function mouseClick(evt){
 	//console.log('Mouse position on click: ' + mouseCoords.x + ',' + mouseCoords.y);
+	if(blockPlacementMode){
+		if(inTileForClick()){
+			createTile(990011, activeBlock.x, activeBlock.y)
+		}
+
+		
+	}
+
 }
+function inTileForClick(){
+	var tileX = activeBlock.x * blockSize
+	var tileY = activeBlock.y * blockSize 
+	
+
+	tileSize = blockSize
+	
+	var distance = playerRadius+tileSize/2
+	if(Math.abs(tileX-player.position.x) < distance && Math.abs(tileY-player.position.y) < distance){
+		if(Math.abs(tileX-player.position.x) < distance || Math.abs(tileY-player.position.y) < distance){
+			return false;
+		}
+		
+
+	}
+
+	
+	return true;
+
+}
+
 function keyDown(e){
 	badKeys = [13,183]//i dont like 183, (actually maybe this will create an error someday lol sorry me)
 	value = e.keyCode
@@ -279,49 +309,10 @@ function sendMessage(){
 	
 }	
 
-function createTile(blockID){
+function createTile(blockID, x, y){
 	//rn physics will call this
-	var blockWiseX = Math.floor((player.position.x+tileSize/2)/tileSize)
-	var blockWiseY = Math.floor((player.position.y+tileSize/2)/tileSize)
-	var blockWiseXLeft = Math.floor((player.position.x-playerRadius)/tileSize);
-	var blockWiseYUp = Math.floor((player.position.y-playerRadius)/tileSize);
-	var blockWiseXRight = Math.floor((player.position.x+tileSize/2+playerRadius)/tileSize);
-	var blockWiseYDown = Math.floor((player.position.y+tileSize/2+playerRadius)/tileSize);
-	console.log(player.rotation)
-	var rot = player.rotation/Math.PI*180
-	if(rot == 0){
-			
-		blockWiseX = blockWiseXRight
-	}
-	else if(rot == 45){
-		blockWiseX = blockWiseXRight
-		blockWiseX = blockWiseXDown
-	}
-	else if(rot == 90){
-		blockWiseY = blockWiseYUp
-	}
-	else if(rot == 135){
-		blockWiseX = blockWiseXLeft
-		blockWiseY = blockWiseYUp
-	}
-	else if(rot == 180){
-		blockWiseX = blockWiseXLeft
-		
-	}
-	else if(rot == 235){
-		blockWiseX = blockWiseXLeft
-		blockWiseY = blockWiseYDown
-	}
-	else if(rot == 270){
-		
-		blockWiseY = blockWiseYDown
-	}
-	else if(rot == 315){
-		blockWiseX = blockWiseXRight
-		blockWiseY = blockWiseYDown
-	}
 	
-	socket.emit('addedTile', {"tile":{"id":blockID,"x":blockWiseX,"y":blockWiseY,"z":0},"roomName":room})
+	socket.emit('addedTile', {"tile":{"id":blockID,"x":x,"y":y,"z":0},"roomName":room})
 
 
 
