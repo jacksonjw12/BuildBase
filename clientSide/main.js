@@ -16,6 +16,9 @@ var mouseCoords = {"x":gameDimmensions[0]/2,"y":gameDimmensions[1]/2}
 var blockPlacementMode = true;
 var stars = undefined;
 var activeBlock = {}
+var spriteSheet = undefined;
+var moving = false;
+var animationState = 0;
 function connect(){
 	roomName = document.getElementById("roomName").value;
 	playerName = document.getElementById("playerName").value;
@@ -61,6 +64,9 @@ function main(){
 	stars = new Image();
 	stars.src = 'stars.gif';
 
+	spriteSheet = new Image();
+	spriteSheet.src = 'spriteSheet.png';
+
 	c = document.getElementById("myCanvas");
 
 	c.addEventListener('mousemove',mouseMove, false);
@@ -102,7 +108,7 @@ function physics(){
 		var yDelta = 0;
 		var prevX = player.position.x
 		var prevY = player.position.y
-
+		moving = false;
 		if(keys.indexOf(67) != -1){
 			blockPlacementMode = !blockPlacementMode
 		}
@@ -110,19 +116,23 @@ function physics(){
 		if(keys.indexOf(87) != -1){
 			player.position.y-=speed;
 			yDelta++;
+			moving = true;
 		}
 		if(keys.indexOf(83) != -1){
 			player.position.y+=speed;
 			yDelta--;
+			moving = true;
 		}
 		if(keys.indexOf(65) != -1){
 			player.position.x-=speed;
 			xDelta--;
+			moving = true;
 
 		}
 		if(keys.indexOf(68) != -1){
 			player.position.x+=speed;
 			xDelta++;
+			moving = true;
 
 		}
 		if(keys.indexOf(66) != -1){

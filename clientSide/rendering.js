@@ -17,7 +17,8 @@ var blockSize = 100;
 var mouseCoords = [gameDimmensions[0]/2,gameDimmensions[1]/2]
 var blockPlacementMode = true;
 var stars = undefined;
-
+var animationState
+var spriteSheet
 
 */
 function render(){
@@ -30,8 +31,8 @@ function render(){
     adjustScreenCenter();
     
     
-    drawPlayer();
-
+    //drawPlayer();
+    drawSprite();
 	
 	drawTiles();
 
@@ -74,6 +75,46 @@ function drawPlayer(){
 	ctx.lineTo(gameDimmensions[0]/2-(player.screenCenter.x-player.position.x)+playerRadius*Math.cos(player.rotation),gameDimmensions[1]/2-(player.screenCenter.y-player.position.y)-playerRadius*Math.sin(player.rotation));
 	ctx.stroke();
 }
+
+
+function drawSprite(){
+	var swidth = 25;
+	var sheight = 35;
+
+
+	if(moving){
+		if(animationState >=40){animationState = 0;}
+		var column = 0;
+		var row = 0;
+		var rot = player.rotation*180/Math.PI
+		col = 3-Math.floor(animationState/10)
+		if(rot == 0){
+			row = 2	
+		}
+		else if(rot == 45 || rot == 90 || rot == 135){
+			row = 3
+		}
+		else if(rot == 180){
+			row = 1
+		}
+		else{
+			row = 0
+		}
+		var sx = 13 + 51*col
+		var sy = 8 + 51*row
+
+		ctx.drawImage(spriteSheet, sx,sy,swidth,sheight,gameDimmensions[0]/2-(player.screenCenter.x-player.position.x)-playerRadius,gameDimmensions[1]/2-(player.screenCenter.y-player.position.y) - playerRadius,80,80);
+		animationState++;
+	}
+	else{
+		ctx.drawImage(spriteSheet, 13,13,25,35,gameDimmensions[0]/2-(player.screenCenter.x-player.position.x)-playerRadius,gameDimmensions[1]/2-(player.screenCenter.y-player.position.y) - playerRadius,80,80);
+
+	}
+	
+
+
+}
+
 
 function drawOtherPlayers(){
 	for(var i = 0; i< locations.length; i++){
