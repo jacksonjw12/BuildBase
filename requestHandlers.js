@@ -18,14 +18,11 @@ var worldExample = {
 	}
 
 	],
-	"tileData":[{"id":0,"x":5,"y":5},{"id":1,"x":6,"y":5},{"id":0,"x":7,"y":5}],//instead of 2d array i will try a block object system
+	"tileData":[{"id":0,"x":5,"y":5},{"id":1,"x":6,"y":5},{"id":0,"x":7,"y":5}],//instead of 2d array i will try a tile object system
 
 	"playerData":[]
 
 }
-
-
-
 
 var worlds = [{
 	"name":"room1",
@@ -42,13 +39,11 @@ var worlds = [{
 	}
 
 	],
-	"tileData":[{"id":999955,"x":3,"y":5,"z":0},{"id":990022,"x":6,"y":5,"z":0},{"id":110090,"x":10,"y":5,"z":0}],//instead of 2d array i will try a block object system
+	"tileData":[{"id":999955,"x":3,"y":5,"z":0},{"id":990022,"x":6,"y":5,"z":0},{"id":110090,"x":10,"y":5,"z":0}],//instead of 2d array i will try a tile object system
 
 	"playerData":[ {"id":"000022","x":400,"y":500}, {"id":"FF5555","x":300,"y":400}]
 
 }];
-
-
 
 var connectedPlayers = [
 	{
@@ -82,12 +77,21 @@ function initializeSockets(server){
 			
 		socket.emit('requestNames', {});
 			
+		socket.on('requestRooms', function (data){
+			var rooms = ""
+			for(var i = 0; i< worlds.length; i++){
+				rooms += worlds[i].name
+			}
+			socket.emit('listRooms', {"rooms":rooms})
+		});
+
 		socket.on('disconnect', function (data){
 			for(playerIterator in connectedPlayers){
 				player = connectedPlayers[playerIterator];
 				if(player.socket == socket){
 					var disconnectedPlayerRoom = player.room;
 					var disconnectedPlayerId = player.id;
+					io.to(player.room).emit('receivedMessage', {"message":player.name + " has disconnected", "ign":player.room,"id":player.id})
 					connectedPlayers.splice(playerIterator,1)
 					for(worldIterator in worlds){
 						world = worlds[worldIterator]
@@ -118,6 +122,7 @@ function initializeSockets(server){
 
 
 			console.log("disconnected");
+			
 		});
 		socket.on('sendMessage', function(data){
 			console.log("----" + data.message + "---")
@@ -222,6 +227,17 @@ function initializeSockets(server){
 
 }
 
+function listRooms(req, res){
+	var rooms = []
+	for(w in worlds){
+		world = worlds[w]
+		rooms.push({"name":world.name,"players":world.players.length})
+	}
+	res.send({"roomList":rooms});
+}
+
+
 var exports;
 exports.test = test;
+exports.listRooms = listRooms;
 exports.initializeSockets = initializeSockets;

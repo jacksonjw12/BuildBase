@@ -11,14 +11,39 @@ var gameDimmensions = [600,600]
 var chatDimmensions = [400,600]
 var tileData = []
 var playerRadius = 40;
-var blockSize = 100;
+var tileSize = 100;
 var mouseCoords = {"x":gameDimmensions[0]/2,"y":gameDimmensions[1]/2}
-var blockPlacementMode = true;
+var tilePlacementMode = true;
 var stars = undefined;
-var activeBlock = {}
+var activetile = {}
 var spriteSheet = undefined;
 var moving = false;
 var animationState = 0;
+
+function getRooms(){
+	var xmlHttp = new XMLHttpRequest();
+	xmlHttp.onreadystatechange = function() { 
+		if(xmlHttp.readyState == 4 && xmlHttp.status == 200){
+			rooms = JSON.parse(xmlHttp.responseText).roomList;
+			var string = "<h3 style='margin-bottom:0px;''>Current Rooms</h3><table style='text-align:center;'><tr><th>Name</th><th># Players</th></tr>" 
+			for(r in rooms){
+				room = rooms[r]
+				string += "<tr><td>" + room.name + "</td><td>" + room.players + "</td></tr>" 
+
+			}
+
+			document.getElementById('rooms').innerHTML = string
+		}
+
+		}
+	xmlHttp.open("GET", "listRooms", true); // true for asynchronous 
+	xmlHttp.send({});
+
+
+
+}
+
+getRooms();
 function connect(){
 	roomName = document.getElementById("roomName").value;
 	playerName = document.getElementById("playerName").value;
@@ -33,6 +58,7 @@ function connect(){
 		createPlayer(playerName)
 		
 		socket = io();
+
 		socket.on('requestNames', function (data){
 			socket.emit('returnNames', {"playerName":player.ign,"id":player.id,"roomName":roomName})
 			
@@ -110,7 +136,7 @@ function physics(){
 		var prevY = player.position.y
 		moving = false;
 		if(keys.indexOf(67) != -1){
-			blockPlacementMode = !blockPlacementMode
+			tilePlacementMode = !tilePlacementMode
 		}
 
 		if(keys.indexOf(87) != -1){
@@ -162,11 +188,11 @@ function physics(){
 			player.rotation = angle
 		}
 
-		//collision time :) todo, make sure a player cant put a block ontop of a player, or that once they do, that player is either immune or gets booted out of the way
+		//collision time :) todo, make sure a player cant put a tile ontop of a player, or that once they do, that player is either immune or gets booted out of the way
 		//player.position.x player.position.y
 		for(var i = 0; i<tileData.length; i++){
 			var tile = tileData[i]
-			tileSize = blockSize
+			tileSize = tileSize
 			var tileX = tile.x*tileSize
 			var tileY = tile.y*tileSize
 			var distance = playerRadius+tileSize/2
@@ -217,9 +243,9 @@ function mouseMove(evt) {
 }
 function mouseClick(evt){
 	//console.log('Mouse position on click: ' + mouseCoords.x + ',' + mouseCoords.y);
-	if(blockPlacementMode){
+	if(tilePlacementMode){
 		if(inTileForClick()){
-			createTile(990011, activeBlock.x, activeBlock.y)
+			createTile(990011, activetile.x, activetile.y)
 		}
 
 		
@@ -227,11 +253,11 @@ function mouseClick(evt){
 
 }
 function inTileForClick(){
-	var tileX = activeBlock.x * blockSize
-	var tileY = activeBlock.y * blockSize 
+	var tileX = activetile.x * tileSize
+	var tileY = activetile.y * tileSize 
 	
 
-	tileSize = blockSize
+	tileSize = tileSize
 	
 	var distance = playerRadius+tileSize/2
 	if(Math.abs(tileX-player.position.x) < distance && Math.abs(tileY-player.position.y) < distance){
@@ -319,10 +345,10 @@ function sendMessage(){
 	
 }	
 
-function createTile(blockID, x, y){
+function createTile(tileID, x, y){
 	//rn physics will call this
 	
-	socket.emit('addedTile', {"tile":{"id":blockID,"x":x,"y":y,"z":0},"roomName":room})
+	socket.emit('addedTile', {"tile":{"id":tileID,"x":x,"y":y,"z":0},"roomName":room})
 
 
 

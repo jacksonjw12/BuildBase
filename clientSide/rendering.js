@@ -13,9 +13,9 @@ var gameDimmensions = [600,600]
 var chatDimmensions = [400,600]
 var tileData = []
 var playerRadius = 40;
-var blockSize = 100;
+var tileSize = 100;
 var mouseCoords = [gameDimmensions[0]/2,gameDimmensions[1]/2]
-var blockPlacementMode = true;
+var tilePlacementMode = true;
 var stars = undefined;
 var animationState
 var spriteSheet
@@ -24,7 +24,7 @@ var spriteSheet
 function render(){
 	drawBackground();
 	
-    if(blockPlacementMode){
+    if(tilePlacementMode){
     	drawTileSpotlight();
     }
 
@@ -51,7 +51,7 @@ function drawBackground(){
 	ctx.fillStyle = "#FBFBFB";
 	ctx.fillRect(0,0,1000,1000);
 	
-    ctx.drawImage(stars, player.screenCenter.x/5-blockSize/2, player.screenCenter.y/5-blockSize/2, gameDimmensions[0]/5, gameDimmensions[1]/5,0,0,gameDimmensions[0],gameDimmensions[1]);//the divided by's needs be the same or parallax stuff
+    ctx.drawImage(stars, player.screenCenter.x/5-tileSize/2, player.screenCenter.y/5-tileSize/2, gameDimmensions[0]/5, gameDimmensions[1]/5,0,0,gameDimmensions[0],gameDimmensions[1]);//the divided by's needs be the same or parallax stuff
 
 }
 
@@ -59,7 +59,7 @@ function drawTiles(){
 	if(tileData.length != 0){
 		for(var j = 0; j<tileData.length; j++){
 			ctx.fillStyle = "#" + tileData[j].id.toString();
-			ctx.fillRect(gameDimmensions[0]/2-(player.screenCenter.x-blockSize*tileData[j].x)-blockSize/2,gameDimmensions[1]/2-(player.screenCenter.y-blockSize*tileData[j].y)-blockSize/2,blockSize,blockSize);
+			ctx.fillRect(gameDimmensions[0]/2-(player.screenCenter.x-tileSize*tileData[j].x)-tileSize/2,gameDimmensions[1]/2-(player.screenCenter.y-tileSize*tileData[j].y)-tileSize/2,tileSize,tileSize);
 		}
 	}
 }
@@ -175,53 +175,60 @@ function drawTileSpotlight(){
 		ctx.arc(gameDimmensions[0]/2-(player.screenCenter.x-player.position.x),gameDimmensions[1]/2-(player.screenCenter.y-player.position.y),300,0,2*Math.PI);
 		ctx.fill();
 		ctx.clip();
-		var beginXPos = (Math.floor(player.screenCenter.x/blockSize)-10)*blockSize;
-		var beginYPos = (Math.floor(player.screenCenter.y/blockSize)-10)*blockSize;
-		var finalXPos = beginXPos + 20 * blockSize;
-		var finalYPos = beginYPos + 20 * blockSize;
+		var beginXPos = (Math.floor(player.screenCenter.x/tileSize)-10)*tileSize;
+		var beginYPos = (Math.floor(player.screenCenter.y/tileSize)-10)*tileSize;
+		var finalXPos = beginXPos + 20 * tileSize;
+		var finalYPos = beginYPos + 20 * tileSize;
 
 		for(var i = 0; i<20; i++){
 			ctx.beginPath();
-			ctx.moveTo((beginXPos+i*blockSize)-player.screenCenter.x-blockSize/2,beginYPos-player.screenCenter.y-blockSize/2);
-			ctx.lineTo((beginXPos+i*blockSize)-player.screenCenter.x-blockSize/2,finalYPos-player.screenCenter.y-blockSize/2);
+			ctx.moveTo((beginXPos+i*tileSize)-player.screenCenter.x-tileSize/2,beginYPos-player.screenCenter.y-tileSize/2);
+			ctx.lineTo((beginXPos+i*tileSize)-player.screenCenter.x-tileSize/2,finalYPos-player.screenCenter.y-tileSize/2);
 			ctx.stroke();
 			ctx.beginPath();
-			ctx.moveTo((beginXPos+i*blockSize)-player.screenCenter.x-blockSize/2+1,beginYPos-player.screenCenter.y-blockSize/2);
-			ctx.lineTo((beginXPos+i*blockSize)-player.screenCenter.x-blockSize/2+1,finalYPos-player.screenCenter.y-blockSize/2);
+			ctx.moveTo((beginXPos+i*tileSize)-player.screenCenter.x-tileSize/2+1,beginYPos-player.screenCenter.y-tileSize/2);
+			ctx.lineTo((beginXPos+i*tileSize)-player.screenCenter.x-tileSize/2+1,finalYPos-player.screenCenter.y-tileSize/2);
 			ctx.stroke();
 
 			ctx.beginPath();
-			ctx.moveTo(beginXPos-player.screenCenter.x-blockSize/2,(beginYPos+i*blockSize)-player.screenCenter.y-blockSize/2);
-			ctx.lineTo(finalXPos-player.screenCenter.x-blockSize/2,(beginYPos+i*blockSize)-player.screenCenter.y-blockSize/2);
+			ctx.moveTo(beginXPos-player.screenCenter.x-tileSize/2,(beginYPos+i*tileSize)-player.screenCenter.y-tileSize/2);
+			ctx.lineTo(finalXPos-player.screenCenter.x-tileSize/2,(beginYPos+i*tileSize)-player.screenCenter.y-tileSize/2);
 			ctx.stroke();
 			ctx.beginPath();
-			ctx.moveTo(beginXPos-player.screenCenter.x-blockSize/2,(beginYPos+i*blockSize)-player.screenCenter.y-blockSize/2+1);
-			ctx.lineTo(finalXPos-player.screenCenter.x-blockSize/2,(beginYPos+i*blockSize)-player.screenCenter.y-blockSize/2+1);
+			ctx.moveTo(beginXPos-player.screenCenter.x-tileSize/2,(beginYPos+i*tileSize)-player.screenCenter.y-tileSize/2+1);
+			ctx.lineTo(finalXPos-player.screenCenter.x-tileSize/2,(beginYPos+i*tileSize)-player.screenCenter.y-tileSize/2+1);
 			ctx.stroke();
 
 
 		}
-		//var cursorXPos =  Math.floor((mouseCoords.x+blockSize/2)/blockSize)*blockSize
-		//var cursorYPos =  (Math.floor((mouseCoords.y+blockSize/2)/blockSize)*blockSize)
-		//(player.screenCenter.x-blockSize*tileData[j].x)-blockSize/2
-		var cursorXPos =  player.screenCenter.x + ( mouseCoords.x-gameDimmensions[0]/2) + blockSize/2
-		var cursorYPos =  player.screenCenter.y + ( mouseCoords.y-gameDimmensions[1]/2) + blockSize/2
-		var cursorBlockX = Math.floor(cursorXPos/blockSize)
-		var cursorBlockY = Math.floor(cursorYPos/blockSize)
-		var cursorScreenX = gameDimmensions[0]/2-(player.screenCenter.x-blockSize*cursorBlockX)-blockSize/2
-		var cursorScreenY = gameDimmensions[1]/2-(player.screenCenter.y-blockSize*cursorBlockY)-blockSize/2
-		ctx.fillRect(cursorScreenX,cursorScreenY,blockSize,blockSize);
+		//var cursorXPos =  Math.floor((mouseCoords.x+tileSize/2)/tileSize)*tileSize
+		//var cursorYPos =  (Math.floor((mouseCoords.y+tileSize/2)/tileSize)*tileSize)
+		//(player.screenCenter.x-tileSize*tileData[j].x)-tileSize/2
+		var cursorXPos =  player.screenCenter.x + ( mouseCoords.x-gameDimmensions[0]/2) + tileSize/2
+		var cursorYPos =  player.screenCenter.y + ( mouseCoords.y-gameDimmensions[1]/2) + tileSize/2
+		var cursortileX = Math.floor(cursorXPos/tileSize)
+		var cursortileY = Math.floor(cursorYPos/tileSize)
+		var cursorScreenX = gameDimmensions[0]/2-(player.screenCenter.x-tileSize*cursortileX)-tileSize/2
+		var cursorScreenY = gameDimmensions[1]/2-(player.screenCenter.y-tileSize*cursortileY)-tileSize/2
+		ctx.fillRect(cursorScreenX,cursorScreenY,tileSize,tileSize);
 
-		activeBlock = {"x":cursorBlockX, "y":cursorBlockY}
+		activetile = {"x":cursortileX, "y":cursortileY}
 
-		//ctx.fillRect(cursorXPos,cursorYPos,blockSize,blockSize)
+		//ctx.fillRect(cursorXPos,cursorYPos,tileSize,tileSize)
 
 
 
 		ctx.restore();
 }
+
+function tileCoordToScreenCoord(tileX,tileY){
+	return {"x":gameDimmensions[0]/2-(player.screenCenter.x-tileSize*tileX)-tileSize/2,
+			"y":gameDimmensions[1]/2-(player.screenCenter.y-tileSize*tileY)-tileSize/2}
+
+}
+
 function mapCoordToCanvasCoord(coord, playerReference){//todo, change to this get some standard way to do that
-	return coord - playerReference - blockSize/2;
+	return coord - playerReference - tileSize/2;
 }
 
 

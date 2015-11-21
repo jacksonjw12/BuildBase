@@ -20,7 +20,7 @@ function start() {
 	app.get('/', function (req, res) {
 		res.sendFile(__dirname + '/html/index.html')
 	});
-
+	app.get('/listRooms',requestHandlers.listRooms)
 	app.get('/test', requestHandlers.test);
 	
 	var server = app.listen(8080);
