@@ -22,8 +22,12 @@ function start() {
 	});
 	app.get('/listRooms',requestHandlers.listRooms)
 	app.get('/test', requestHandlers.test);
-	
-	var server = app.listen(8080);
+	var port = 8080;
+	if(process.platform == "linux"){
+		port = 80
+	}
+
+	var server = app.listen(port);
 	
 	requestHandlers.initializeSockets(server);
 	
