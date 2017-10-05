@@ -22,9 +22,9 @@ function start() {
 	});
 	app.get('/listRooms',requestHandlers.listRooms)
 	app.get('/test', requestHandlers.test);
-	var port = 8080;
+	var port = 8081;
 	if(process.platform == "linux"){
-		port = 8090
+		port = 8081
 	}
 
 	var server = app.listen(port);
