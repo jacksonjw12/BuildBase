@@ -24,7 +24,7 @@ function start() {
 	app.get('/test', requestHandlers.test);
 	var port = 8080;
 	if(process.platform == "linux"){
-		port = 80
+		port = 8090
 	}
 
 	var server = app.listen(port);
